@@ -1,0 +1,198 @@
+.wedding-cover {
+    min-height: 100vh;
+    font-family: 'Playfair Display', serif;
+    color: #000000;
+  }
+  
+  .hero-section {
+    position: relative;
+    height: 100vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+                url('https://images.unsplash.com/photo-1600041161228-519e6dd27bac?auto=format&fit=crop&w=1920') center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.4);
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .couple-names {
+    font-size: 4.5rem;
+    letter-spacing: -2px;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  
+  .ampersand {
+    font-family: 'Arial', sans-serif;
+    font-weight: 300;
+    margin: 0 1rem;
+  }
+  
+  .wedding-date {
+    margin: 2rem 0;
+    display: inline-flex;
+    flex-direction: column;
+    border-top: 2px solid #000;
+    border-bottom: 2px solid #000;
+    padding: 1rem 0;
+  }
+  
+  .date-day {
+    font-size: 5rem;
+    line-height: 1;
+    font-weight: 300;
+  }
+  
+  .date-month {
+    font-size: 1.5rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    margin: 0.5rem 0;
+  }
+  
+  .date-year {
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+  }
+  
+  .wedding-quote {
+    font-size: 1.4rem;
+    margin: 2rem auto;
+    max-width: 600px;
+    line-height: 1.6;
+    font-style: italic;
+    font-weight: 300;
+  }
+  
+  .scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .chevron {
+    width: 20px;
+    height: 2px;
+    background: #000;
+    margin: 4px 0;
+    animation: scrollPulse 2s infinite;
+  }
+  
+  .chevron:nth-child(1) { animation-delay: 0s }
+  .chevron:nth-child(2) { animation-delay: 0.2s }
+  .chevron:nth-child(3) { animation-delay: 0.4s }
+  
+  @keyframes scrollPulse {
+    0% { opacity: 0; transform: translateX(-10px) }
+    50% { opacity: 1; transform: translateX(0) }
+    100% { opacity: 0; transform: translateX(10px) }
+  }
+  
+  .countdown-section {
+    padding: 4rem 1rem;
+    background: #ffffff;
+    text-align: center;
+  }
+  
+  .countdown-section h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    font-weight: 300;
+    letter-spacing: 3px;
+  }
+  
+  .countdown-timer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+  }
+  
+  .time-block {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .number {
+    font-size: 4rem;
+    font-weight: 300;
+    line-height: 1;
+  }
+  
+  .label {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 0.5rem;
+  }
+  
+  .separator {
+    font-size: 3rem;
+    margin: 0 -1rem;
+    font-weight: 100;
+  }
+  
+  @media (max-width: 768px) {
+    .couple-names {
+      font-size: 3rem;
+    }
+    
+    .date-day {
+      font-size: 3.5rem;
+    }
+    
+    .date-month {
+      font-size: 1.2rem;
+    }
+    
+    .date-year {
+      font-size: 1.4rem;
+    }
+    
+    .wedding-quote {
+      font-size: 1.1rem;
+    }
+    
+    .number {
+      font-size: 2.5rem;
+    }
+    
+    .separator {
+      font-size: 2rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .couple-names {
+      font-size: 2.2rem;
+    }
+    
+    .countdown-timer {
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .time-block {
+      width: 45%;
+    }
+  }
