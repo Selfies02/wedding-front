@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    allowedHosts: ['https://wedding-front-kappa.vercel.app'], // Permite este host
+    allowedHosts: ['https://wedding-front-git-main-alexis-projects-e2504c72.vercel.app'],
     proxy: {
       '/api': {
         target: 'https://wedding-back-bkutww.fly.dev',

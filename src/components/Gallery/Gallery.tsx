@@ -103,7 +103,7 @@ const Gallery: React.FC = () => {
             const author = (parts[1] || 'Desconocido').replace(/-/g, ' ');
             return {
               id: index + 1,
-              url: `https://wedding-back-bkutww.fly.dev/api/uploads/photos/${fileName}`,
+              url: `https://wedding-back-bkutww.fly.dev/uploads/photos/${fileName}`,
               title,
               author,
             };

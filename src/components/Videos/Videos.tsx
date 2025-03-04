@@ -104,7 +104,7 @@ const Videos: React.FC = () => {
             const author = (parts[1] || 'Desconocido').replace(/-/g, ' ');
             return {
               id: index + 1,
-              url: `https://wedding-back-bkutww.fly.dev/api/uploads/videos/${fileName}`,
+              url: `https://wedding-back-bkutww.fly.dev/uploads/videos/${fileName}`,
               title,
               author,
             };
