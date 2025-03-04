@@ -4,14 +4,15 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    allowedHosts: ['chad-valium-skating-responsibility.trycloudflare.com'], // Permite este host
+    allowedHosts: ['https://wedding-front-kappa.vercel.app'], // Permite este host
     proxy: {
       '/api': {
-        target: 'https://wedding-front-kappa.vercel.app/',
+        target: 'https://wedding-back-bkutww.fly.dev',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '') 
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
+    
   }
 })
