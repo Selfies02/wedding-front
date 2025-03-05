@@ -87,7 +87,7 @@ const Gallery: React.FC = () => {
     const fetchPhotos = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://wedding-back-bkutww.fly.dev/api/upload-files/photos');
+        const response = await fetch('http://18.188.173.108/api/upload-files/photos');
   
         if (!response.ok) {
           const errorData = await response.json();
@@ -103,7 +103,7 @@ const Gallery: React.FC = () => {
             const author = (parts[1] || 'Desconocido').replace(/-/g, ' ');
             return {
               id: index + 1,
-              url: `https://wedding-back-bkutww.fly.dev/uploads/photos/${fileName}`,
+              url: `http://18.188.173.108/uploads/photos/${fileName}`,
               title,
               author,
             };
@@ -202,7 +202,7 @@ const Gallery: React.FC = () => {
           
           const newPhotos: Photo[] = result.files.map((fileName: string, index: number) => ({
             id: photos.length + index + 1,
-            url: `https://wedding-back-bkutww.fly.dev/api/uploads/photos/${fileName}`,
+            url: `http://18.188.173.108/uploads/photos/${fileName}`,
             title: title,
             author: author,
           }));
@@ -235,7 +235,7 @@ const Gallery: React.FC = () => {
         throw new Error('Error de red al intentar subir las imágenes');
       };
       
-      xhr.open('POST', 'https://wedding-back-bkutww.fly.dev/api/upload-files/files', true);
+      xhr.open('POST', 'http://18.188.173.108/api/upload-files/files', true);
       xhr.send(formData);
   
     } catch (error: unknown) { 
@@ -256,7 +256,7 @@ const Gallery: React.FC = () => {
             throw new Error('No se pudo extraer el nombre del archivo');
           }
   
-          const response = await fetch('https://wedding-back-bkutww.fly.dev/api/upload-files/remove/photo', {
+          const response = await fetch('http://18.188.173.108/api/upload-files/remove/photo', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ fileName }),

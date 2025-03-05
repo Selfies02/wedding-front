@@ -87,7 +87,7 @@ const Videos: React.FC = () => {
     const fetchVideos = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://wedding-back-bkutww.fly.dev/api/upload-files/videos');
+        const response = await fetch('http://18.188.173.108/api/upload-files/videos');
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -104,7 +104,7 @@ const Videos: React.FC = () => {
             const author = (parts[1] || 'Desconocido').replace(/-/g, ' ');
             return {
               id: index + 1,
-              url: `https://wedding-back-bkutww.fly.dev/uploads/videos/${fileName}`,
+              url: `http://18.188.173.108/uploads/videos/${fileName}`,
               title,
               author,
             };
@@ -194,7 +194,7 @@ const Videos: React.FC = () => {
           
           const newVideos: Video[] = result.files.map((fileName: string, index: number) => ({
             id: videos.length + index + 1,
-            url: `https://wedding-back-bkutww.fly.dev/api/uploads/videos/${fileName}`,
+            url: `http://18.188.173.108/uploads/videos/${fileName}`,
             title: title,
             author: author,
           }));
@@ -226,7 +226,7 @@ const Videos: React.FC = () => {
         throw new Error('Error de red al intentar subir los videos');
       };
       
-      xhr.open('POST', 'https://wedding-back-bkutww.fly.dev/api/upload-files/files', true);
+      xhr.open('POST', 'http://18.188.173.108/api/upload-files/files', true);
       xhr.send(formData);
   
     } catch (error: unknown) { 
@@ -247,7 +247,7 @@ const Videos: React.FC = () => {
             throw new Error('No se pudo extraer el nombre del archivo');
           }
   
-          const response = await fetch('https://wedding-back-bkutww.fly.dev/api/upload-files/remove/video', {
+          const response = await fetch('http://18.188.173.108/api/upload-files/remove/video', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ fileName }),
