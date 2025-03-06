@@ -128,7 +128,7 @@ const Videos: React.FC = () => {
     fetchVideos();
   }, []);
 
-  // Se agrega la lógica de iOS/móviles: se deshabilita el drag & drop en estos dispositivos
+  // Lógica de iOS/móviles: deshabilitar drag & drop en estos dispositivos
   const handleDrag = (e: React.DragEvent) => {
     if (isMobile()) return;
     e.preventDefault();
@@ -206,7 +206,7 @@ const Videos: React.FC = () => {
       
           setVideos((prevVideos) => [...prevVideos, ...newVideos]);
           
-          // Limpiar el formulario después de una subida exitosa
+          // Retrasar la limpieza del formulario para evitar problemas en Safari
           setTimeout(() => {
             setShowUploadForm(false);
             setSelectedFiles([]);
@@ -217,7 +217,7 @@ const Videos: React.FC = () => {
             setTimeout(() => {
               setShowProgressBubbles(false);
             }, 1500);
-          }, 1000);
+          }, 2000);
           
           toast.success('Videos subidos correctamente');
         } else {
@@ -277,7 +277,7 @@ const Videos: React.FC = () => {
       "Cancelar",
       "Confirmar eliminación"
     );
-  };  
+  };
 
   const downloadVideo = async (url: string, title: string) => {
     try {
@@ -323,7 +323,7 @@ const Videos: React.FC = () => {
     } catch (error) {
       toast.error('No se pudo compartir el video. Intenta descargarlo manualmente.');
     }
-  };  
+  };
 
   const openFileShare = (blob: Blob, fileName: string) => {
     const link = document.createElement('a');
@@ -433,7 +433,8 @@ const Videos: React.FC = () => {
                         e.stopPropagation();
                         fileInputRef.current?.click();
                       }}
-                      className="select-file-button">
+                      className="select-file-button"
+                    >
                       Selecciona archivos
                     </button>
                     <p className="file-info">MP4, MOV, AVI hasta 100MB</p>
@@ -446,6 +447,8 @@ const Videos: React.FC = () => {
                 className="file-input"
                 accept="video/*"
                 multiple
+                // En dispositivos móviles se omite la propiedad "capture" para evitar que se abra la cámara
+                {...(isMobile() ? {} : { capture: 'environment' })}
                 onChange={(e) => handleFileSelect(Array.from(e.target.files || []))}
               />
             </div>

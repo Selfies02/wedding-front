@@ -216,9 +216,11 @@ const Gallery: React.FC = () => {
       
           setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
           
-          // Limpiar formulario tras subida exitosa
+          // Limpiar formulario tras subida exitosa con un retraso para Safari
           setTimeout(() => {
             setShowUploadForm(false);
+            // Retrasar la revocación de los blob URLs para evitar el error en Safari
+            previews.forEach(url => URL.revokeObjectURL(url));
             setSelectedFiles([]);
             setPreviews([]);
             setTitle('');
@@ -228,7 +230,7 @@ const Gallery: React.FC = () => {
             setTimeout(() => {
               setShowProgressBubbles(false);
             }, 1500);
-          }, 1000);
+          }, 2000);
           
           toast.success('Imágenes subidas correctamente');
         } else {
@@ -297,11 +299,16 @@ const Gallery: React.FC = () => {
       const extension = urlParts[urlParts.length - 1].split('?')[0];
       const filename = `${title}.${extension}`;
       const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
+      const blobUrl = URL.createObjectURL(blob);
+      link.href = blobUrl;
       link.download = filename;
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      // Retrasar la revocación del blob URL
+      setTimeout(() => {
+        URL.revokeObjectURL(blobUrl);
+        document.body.removeChild(link);
+      }, 1000);
       toast.success('Imagen descargada correctamente');
     } catch (error) {
       console.error('Error al descargar la imagen:', error);
@@ -465,7 +472,6 @@ const Gallery: React.FC = () => {
                 type="file"
                 accept="image/*"
                 multiple
-                capture
                 className="file-input"
                 onChange={(e) => handleFileSelect(Array.from(e.target.files || []))}
               />
@@ -552,7 +558,7 @@ const Gallery: React.FC = () => {
         </div>
       )}
 
-      {/* Modal para ver la imagen en tamaño original, encima de todo */}
+      {/* Modal para ver la imagen en tamaño original */}
       {selectedPhoto && (
         <div 
           className="modal-overlay" 
