@@ -19,6 +19,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
@@ -42,10 +43,6 @@ body {
   color: #666;
   text-align: center;
   padding: 2rem;
-}
-
-button, input, textarea {
-  font-family: inherit;
 }
 
 button {

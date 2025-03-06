@@ -17,6 +17,9 @@ interface UploadProgress {
   size: string;
 }
 
+// Función para detectar dispositivos móviles (iOS y Android)
+const isMobile = () => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
 const AnimatedCard: React.FC<{ children: React.ReactNode; index: number }> = ({ children, index }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -96,7 +99,7 @@ const Videos: React.FC = () => {
         
         const data = await response.json();
         
-        // Check if data.videos exists and is an array before mapping
+        // Verificar que data.videos exista y sea un array
         if (data && data.videos && Array.isArray(data.videos)) {
           const videosList = data.videos.map((fileName: string, index: number) => {
             const parts = fileName.split('_');
@@ -111,9 +114,8 @@ const Videos: React.FC = () => {
           });
           setVideos(videosList);
         } else {
-          // Handle the case where data.videos is undefined or not an array
           setVideos([]);
-          console.error('No videos data found or invalid format:', data);
+          console.error('No se encontró datos de videos o el formato es inválido:', data);
         }
       } catch (error: unknown) {
         const errMessage = error instanceof Error ? error.message : 'Error desconocido';
@@ -126,13 +128,16 @@ const Videos: React.FC = () => {
     fetchVideos();
   }, []);
 
+  // Se agrega la lógica de iOS/móviles: se deshabilita el drag & drop en estos dispositivos
   const handleDrag = (e: React.DragEvent) => {
+    if (isMobile()) return;
     e.preventDefault();
     e.stopPropagation();
     setDragActive(e.type === "dragenter" || e.type === "dragover");
   };
 
   const handleDrop = (e: React.DragEvent) => {
+    if (isMobile()) return;
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -155,7 +160,7 @@ const Videos: React.FC = () => {
       setUploading(true);
       setShowProgressBubbles(true); // Mostrar las burbujas de progreso
       
-      // Initialize progress tracking for each file
+      // Inicializar el tracking de progreso para cada archivo
       const initialProgress = selectedFiles.map(file => ({
         fileName: file.name,
         progress: 0,
@@ -171,14 +176,14 @@ const Videos: React.FC = () => {
       formData.append('uploadedBy', author);
       formData.append('title', title);
       
-      // Use XMLHttpRequest instead of fetch to track upload progress
+      // Usar XMLHttpRequest para poder seguir el progreso de subida
       const xhr = new XMLHttpRequest();
       
       xhr.upload.addEventListener('progress', (event) => {
         if (event.lengthComputable) {
           const percentComplete = (event.loaded / event.total) * 100;
           
-          // Update progress for all files (distributing progress evenly)
+          // Actualizar el progreso para todos los archivos (distribuyendo el progreso de forma uniforme)
           setUploadProgress(prev => 
             prev.map(item => ({
               ...item,
@@ -201,7 +206,7 @@ const Videos: React.FC = () => {
       
           setVideos((prevVideos) => [...prevVideos, ...newVideos]);
           
-          // Clear form after successful upload
+          // Limpiar el formulario después de una subida exitosa
           setTimeout(() => {
             setShowUploadForm(false);
             setSelectedFiles([]);
@@ -209,11 +214,10 @@ const Videos: React.FC = () => {
             setAuthor('');
             setUploadProgress([]);
             setUploading(false);
-            // Ocultamos las burbujas de progreso después de un tiempo
             setTimeout(() => {
               setShowProgressBubbles(false);
             }, 1500);
-          }, 1000); // Delay to let user see 100% completion
+          }, 1000);
           
           toast.success('Videos subidos correctamente');
         } else {
@@ -333,8 +337,7 @@ const Videos: React.FC = () => {
   };
 
   const toggleUploadForm = () => {
-    if (uploading) return; // Prevent closing form while uploading
-    
+    if (uploading) return; // Evitar cerrar el formulario durante la subida
     setShowUploadForm(!showUploadForm);
     if (!showUploadForm) {
       setSelectedFiles([]);
@@ -424,7 +427,13 @@ const Videos: React.FC = () => {
                 ) : (
                   <>
                     <p>Arrastra y suelta videos aquí o</p>
-                    <button type="button" onClick={() => fileInputRef.current?.click()} className="select-file-button">
+                    <button
+                      type="button" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fileInputRef.current?.click();
+                      }}
+                      className="select-file-button">
                       Selecciona archivos
                     </button>
                     <p className="file-info">MP4, MOV, AVI hasta 100MB</p>

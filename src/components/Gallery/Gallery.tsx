@@ -17,6 +17,8 @@ interface UploadProgress {
   size: string;
 }
 
+const BASE_URL = "http://18.188.173.108";
+
 const AnimatedCard: React.FC<{ children: React.ReactNode; index: number }> = ({ children, index }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -72,6 +74,9 @@ const Gallery: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
   const [showProgressBubbles, setShowProgressBubbles] = useState(false);
 
+  // Estado para la imagen seleccionada (para modal)
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -87,7 +92,7 @@ const Gallery: React.FC = () => {
     const fetchPhotos = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://18.188.173.108/api/upload-files/photos');
+        const response = await fetch(`${BASE_URL}/api/upload-files/photos`);
   
         if (!response.ok) {
           const errorData = await response.json();
@@ -103,7 +108,7 @@ const Gallery: React.FC = () => {
             const author = (parts[1] || 'Desconocido').replace(/-/g, ' ');
             return {
               id: index + 1,
-              url: `http://18.188.173.108/uploads/photos/${fileName}`,
+              url: `${BASE_URL}/uploads/photos/${fileName}`,
               title,
               author,
             };
@@ -124,13 +129,18 @@ const Gallery: React.FC = () => {
     fetchPhotos();
   }, []);  
 
+  // Detecta si es un dispositivo móvil
+  const isMobile = () => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
   const handleDrag = (e: React.DragEvent) => {
+    if (isMobile()) return; // Desactiva drag & drop en móviles
     e.preventDefault();
     e.stopPropagation();
     setDragActive(e.type === "dragenter" || e.type === "dragover");
   };
 
   const handleDrop = (e: React.DragEvent) => {
+    if (isMobile()) return; // Desactiva drag & drop en móviles
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -144,7 +154,6 @@ const Gallery: React.FC = () => {
     // Conservar archivos existentes y agregar nuevos
     const validImages = [...selectedFiles, ...files.filter(file => file.type.startsWith('image/'))];
     
-    // Limpiar solo las URLs de las eliminadas
     const newPreviews = validImages.map(file => 
       selectedFiles.includes(file) 
         ? previews[selectedFiles.indexOf(file)] 
@@ -163,7 +172,7 @@ const Gallery: React.FC = () => {
       setUploading(true);
       setShowProgressBubbles(true);
       
-      // Initialize progress tracking for each file
+      // Inicializar progreso para cada archivo
       const initialProgress = selectedFiles.map(file => ({
         fileName: file.name,
         progress: 0,
@@ -179,14 +188,12 @@ const Gallery: React.FC = () => {
       formData.append('uploadedBy', author);
       formData.append('title', title);
       
-      // Use XMLHttpRequest instead of fetch to track upload progress
+      // Usar XMLHttpRequest para rastrear el progreso
       const xhr = new XMLHttpRequest();
       
       xhr.upload.addEventListener('progress', (event) => {
         if (event.lengthComputable) {
           const percentComplete = (event.loaded / event.total) * 100;
-          
-          // Update progress for all files (distributing progress evenly)
           setUploadProgress(prev => 
             prev.map(item => ({
               ...item,
@@ -202,14 +209,14 @@ const Gallery: React.FC = () => {
           
           const newPhotos: Photo[] = result.files.map((fileName: string, index: number) => ({
             id: photos.length + index + 1,
-            url: `http://18.188.173.108/uploads/photos/${fileName}`,
-            title: title,
-            author: author,
+            url: `${BASE_URL}/uploads/photos/${fileName}`,
+            title,
+            author,
           }));
       
           setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
           
-          // Clear form after successful upload
+          // Limpiar formulario tras subida exitosa
           setTimeout(() => {
             setShowUploadForm(false);
             setSelectedFiles([]);
@@ -218,11 +225,10 @@ const Gallery: React.FC = () => {
             setAuthor('');
             setUploadProgress([]);
             setUploading(false);
-            // Hide progress bubbles after a delay
             setTimeout(() => {
               setShowProgressBubbles(false);
             }, 1500);
-          }, 1000); // Delay to let user see 100% completion
+          }, 1000);
           
           toast.success('Imágenes subidas correctamente');
         } else {
@@ -235,7 +241,7 @@ const Gallery: React.FC = () => {
         throw new Error('Error de red al intentar subir las imágenes');
       };
       
-      xhr.open('POST', 'http://18.188.173.108/api/upload-files/files', true);
+      xhr.open('POST', `${BASE_URL}/api/upload-files/files`, true);
       xhr.send(formData);
   
     } catch (error: unknown) { 
@@ -256,7 +262,7 @@ const Gallery: React.FC = () => {
             throw new Error('No se pudo extraer el nombre del archivo');
           }
   
-          const response = await fetch('http://18.188.173.108/api/upload-files/remove/photo', {
+          const response = await fetch(`${BASE_URL}/api/upload-files/remove/photo`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ fileName }),
@@ -269,7 +275,6 @@ const Gallery: React.FC = () => {
           }
   
           setPhotos((prevPhotos) => prevPhotos.filter((p) => p.id !== photo.id));
-  
           toast.success('Foto eliminada correctamente');
   
         } catch (error: unknown) {
@@ -297,9 +302,7 @@ const Gallery: React.FC = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-  
       toast.success('Imagen descargada correctamente');
-  
     } catch (error) {
       console.error('Error al descargar la imagen:', error);
       toast.error('Error al descargar la imagen');
@@ -317,11 +320,10 @@ const Gallery: React.FC = () => {
   
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
-          title: title,
+          title,
           text: '¡Mira esta imagen increíble!',
           files: [file],
         });
-  
       } else {
         openFileShare(blob, fileName);
       }
@@ -337,16 +339,14 @@ const Gallery: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
     alert('La imagen se ha guardado en tu computadora. Ahora puedes compartirla manualmente.');
   };
 
   const toggleUploadForm = () => {
     if (uploading) return;
-  
     setShowUploadForm(prev => {
       if (prev) {
-        // Resetear solo al cerrar
+        // Al cerrar, limpiar previews y archivos seleccionados
         previews.forEach(url => URL.revokeObjectURL(url));
         setSelectedFiles([]);
         setPreviews([]);
@@ -360,15 +360,11 @@ const Gallery: React.FC = () => {
   };
 
   const removePreview = (index: number) => {
-    // Revocar URL de la preview eliminada
     URL.revokeObjectURL(previews[index]);
-    
     const newFiles = [...selectedFiles];
     const newPreviews = [...previews];
-    
     newFiles.splice(index, 1);
     newPreviews.splice(index, 1);
-    
     setSelectedFiles(newFiles);
     setPreviews(newPreviews);
   };
@@ -381,27 +377,20 @@ const Gallery: React.FC = () => {
       >
         <h1>Galería de Fotografías</h1>
         <p>Descubre impresionantes imágenes compartidas por nuestra comunidad</p>
-
         <div className="upload-button-container">
-          <button 
-            onClick={toggleUploadForm} 
-            className="upload-btn"
-            disabled={uploading}
-          >
+          <button onClick={toggleUploadForm} className="upload-btn" disabled={uploading}>
             {showUploadForm ? 'Cancelar' : 'Subir imágenes'}
           </button>
         </div>
       </div>
 
-      {/* Progress bubbles panel */}
       {showProgressBubbles && uploadProgress.length > 0 && (
         <div className="progress-bubbles-container">
           <div className="progress-bubbles-header">
-            <h3>Subiendo {uploadProgress.length} {uploadProgress.length === 1 ? 'imagen' : 'imágenes'}</h3>
-            <button 
-              className="minimize-progress-btn"
-              onClick={() => setShowProgressBubbles(false)}
-            >
+            <h3>
+              Subiendo {uploadProgress.length} {uploadProgress.length === 1 ? 'imagen' : 'imágenes'}
+            </h3>
+            <button className="minimize-progress-btn" onClick={() => setShowProgressBubbles(false)}>
               <MinimizeIcon />
             </button>
           </div>
@@ -411,18 +400,13 @@ const Gallery: React.FC = () => {
                 <div className="progress-bubble-name-container">
                   <FileImageIcon />
                   <span className="progress-bubble-name">
-                    {file.fileName.length > 20 
-                      ? file.fileName.slice(0, 17) + '...' 
-                      : file.fileName}
+                    {file.fileName.length > 20 ? file.fileName.slice(0, 17) + '...' : file.fileName}
                   </span>
                 </div>
                 <span className="progress-bubble-percentage">{Math.round(file.progress)}%</span>
               </div>
               <div className="progress-bubble-bar-bg">
-                <div 
-                  className="progress-bubble-bar-fill" 
-                  style={{ width: `${file.progress}%` }}
-                ></div>
+                <div className="progress-bubble-bar-fill" style={{ width: `${file.progress}%` }}></div>
               </div>
             </div>
           ))}
@@ -432,11 +416,11 @@ const Gallery: React.FC = () => {
       {showUploadForm && !uploading && (
         <div className="upload-form-container">
           <form onSubmit={handleUpload} className="upload-form">
-            <div 
-              className={`dropzone ${dragActive ? 'active' : ''}`} 
-              onDragEnter={handleDrag} 
-              onDragLeave={handleDrag} 
-              onDragOver={handleDrag} 
+            <div
+              className={`dropzone ${dragActive ? 'active' : ''}`}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
             >
@@ -445,15 +429,11 @@ const Gallery: React.FC = () => {
                   <div className="preview-grid">
                     {previews.map((preview, index) => (
                       <div key={index} className="preview-container">
-                        <img 
-                          src={preview} 
-                          alt={`Preview ${index}`} 
-                          className="image-preview"
-                        />
-                        <button 
-                          className="remove-preview" 
+                        <img src={preview} alt={`Preview ${index}`} className="image-preview" />
+                        <button
+                          className="remove-preview"
                           onClick={(e) => {
-                            e.stopPropagation(); // Evitar que el click llegue al dropzone
+                            e.stopPropagation();
                             removePreview(index);
                           }}
                           title="Eliminar imagen"
@@ -466,19 +446,27 @@ const Gallery: React.FC = () => {
                 ) : (
                   <>
                     <p>Arrastra y suelta imágenes aquí o</p>
-                    <button type="button" onClick={() => fileInputRef.current?.click()} className="select-file-button">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fileInputRef.current?.click();
+                      }}
+                      className="select-file-button"
+                    >
                       Selecciona archivos
                     </button>
-                    <p className="file-info">PNG, JPG, GIF hasta 10MB</p>
+                    <p className="file-info">PNG, JPG, JPEG</p>
                   </>
                 )}
               </div>
               <input
                 ref={fileInputRef}
                 type="file"
-                className="file-input"
                 accept="image/*"
                 multiple
+                capture
+                className="file-input"
                 onChange={(e) => handleFileSelect(Array.from(e.target.files || []))}
               />
             </div>
@@ -488,7 +476,6 @@ const Gallery: React.FC = () => {
                 <label>Título de la imagen</label>
                 <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
               </div>
-
               <div className="form-group">
                 <label>Autor</label>
                 <input type="text" value={author} onChange={(e) => setAuthor(e.target.value)} required />
@@ -496,10 +483,12 @@ const Gallery: React.FC = () => {
             </div>
 
             <div className="form-actions">
-              <button type="button" onClick={toggleUploadForm} className="cancel-button">Cancelar</button>
-              <button 
-                type="submit" 
-                disabled={uploading || selectedFiles.length === 0 || !title || !author} 
+              <button type="button" onClick={toggleUploadForm} className="cancel-button">
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={uploading || selectedFiles.length === 0 || !title || !author}
                 className="submit-button"
               >
                 {uploading ? 'Subiendo...' : 'Subir imágenes'}
@@ -518,8 +507,16 @@ const Gallery: React.FC = () => {
         <div className="photos-grid">
           {photos.map((photo, index) => (
             <AnimatedCard key={photo.id} index={index}>
-              <div className="photo-image">
-                <img src={photo.url} alt={photo.title} loading="lazy" />
+              <div 
+                className="photo-image" 
+                onClick={() => setSelectedPhoto(photo)}
+                style={{ cursor: 'pointer' }}
+              >
+                <img 
+                  src={photo.url} 
+                  alt={photo.title} 
+                  loading="lazy" 
+                />
               </div>
               <div className="photo-info">
                 <h3>{photo.title}</h3>
@@ -552,6 +549,31 @@ const Gallery: React.FC = () => {
               </div>
             </AnimatedCard>
           ))}
+        </div>
+      )}
+
+      {/* Modal para ver la imagen en tamaño original, encima de todo */}
+      {selectedPhoto && (
+        <div 
+          className="modal-overlay" 
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <div 
+            className="modal-content" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button 
+              className="close-modal" 
+              onClick={() => setSelectedPhoto(null)}
+            >
+              ×
+            </button>
+            <img 
+              src={selectedPhoto.url} 
+              alt={selectedPhoto.title} 
+              className="full-size-image" 
+            />
+          </div>
         </div>
       )}
     </div>
