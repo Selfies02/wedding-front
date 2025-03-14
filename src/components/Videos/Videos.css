@@ -235,19 +235,23 @@
 }
 
 .videos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
+  column-count: 3;
+  column-gap: 2rem;
+  padding: 1rem;
 }
 
 .video-card {
-  border-radius: 8px;
+  display: inline-block;
+  width: 100%;
+  border-radius: 1rem;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   background-color: white;
   transform: translateY(20px);
   opacity: 0;
   transition: all 0.3s ease;
+  margin-bottom: 2rem;
+  break-inside: avoid;
 }
 
 .video-card.animate-in {
@@ -257,18 +261,16 @@
 }
 
 .video-player {
-  position: relative;
-  padding-top: 56.25%; /* 16:9 Aspect Ratio */
-  background-color: #000;
+  background-color: #fff;
+  text-align: center;
 }
 
 .video-player video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  width: 81%;
+  height: auto; /* Dejas que crezca */
+  padding: 0.5rem;
   object-fit: cover;
+  border-radius: 20px;
 }
 
 .video-info {
@@ -490,5 +492,72 @@
   
   .progress-bubbles-header {
     padding: 10px 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .videos-grid {
+    column-count: 2;
+    column-gap: 1.5rem;
+    padding: 0.5rem;
+  }
+  .video-player video {
+    width: 100%;
+  }
+  .videos-header {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .video-info {
+    padding: 0.5rem;
+  }
+  .video-info h3{
+    font-size: 1rem; /* disminuido desde 1.25rem */
+    margin-bottom: 0.25rem;
+  }
+  .video-info p{
+    font-size: 0.75rem; /* disminuido desde 0.9rem */
+    margin-bottom: 0.5rem;
+  }
+  .action-btn {
+    padding: 0.3rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Mantenemos 2 columnas para conservar el efecto mosaico, incluso en pantallas muy pequeñas */
+  .videos-grid {
+    column-count: 2;
+    column-gap: 1rem;
+    padding: 0.5rem;
+  }
+  .videos-container {
+    padding: 0.5rem;
+  }
+  .videos-header {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  .videos-header h1 {
+    font-size: 2rem;
+  }
+  .videos-header p {
+    font-size: 0.9rem;
+  }
+  .video-info {
+    padding: 0.5rem;
+  }
+  .video-info h3{
+    font-size: 1rem; /* disminuido desde 1.25rem */
+    margin-bottom: 0.25rem;
+  }
+  .video-info p{
+    font-size: 0.75rem; /* disminuido desde 0.9rem */
+    margin-bottom: 0.5rem;
+  }
+  .action-btn {
+    padding: 0.3rem;
+    font-size: 0.8rem;
   }
 }
