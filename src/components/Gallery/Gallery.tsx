@@ -17,7 +17,7 @@ interface UploadProgress {
   size: string;
 }
 
-const BASE_URL = "http://3.21.100.147";
+const BASE_URL = "http://3.128.170.227 ";
 
 const AnimatedCard: React.FC<{ children: React.ReactNode; index: number }> = ({ children, index }) => {
   const cardRef = useRef<HTMLDivElement>(null);
