@@ -15,9 +15,9 @@ const Home: React.FC = () => {
           </h1>
 
           <div className="wedding-date">
-            <span className="date-day">18</span>
-            <span className="date-month">AGOSTO</span>
-            <span className="date-year">2024</span>
+            <span className="date-day">26</span>
+            <span className="date-month">JULIO</span>
+            <span className="date-year">2025</span>
           </div>
 
           <p className="wedding-quote">
